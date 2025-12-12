@@ -67,10 +67,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
 
           script: |
-            echo "> Logging into GHCR ... "
+            echo "> Logging into GHCR ..."
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-            echo "> Pulling latest images ... "
+            echo "> Pulling latest images ..."
             docker pull ghcr.io/${{ env.GHCR_OWNER }}/${{ env.IMAGE_NAME_BACKEND }}:latest
             docker pull ghcr.io/${{ env.GHCR_OWNER }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
 
