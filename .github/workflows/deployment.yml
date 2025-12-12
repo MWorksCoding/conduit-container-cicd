@@ -2,7 +2,8 @@ name: CI/CD - Build, Push & Deploy
 
 on:
   push:
-    branches: ["*"]
+    branches:
+      - "**"
   workflow_dispatch:
 
 env:
