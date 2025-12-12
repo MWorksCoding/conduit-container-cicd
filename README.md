@@ -1,4 +1,4 @@
-# Conduit Fullstack Container Project
+# Conduit Fullstack Container Project with CI/CD Pipeline (GitHub Actions)
 
 A complete Conduit demo application featuring an Angular frontend and a Django backend, packaged with Docker and Docker Compose for simple, reproducible setup and deployment.
 
@@ -7,7 +7,7 @@ A complete Conduit demo application featuring an Angular frontend and a Django b
 1. [Prerequisites](#prerequisites)
 2. [Quickstart](#-quickstart)
 3. [Usage](#-usage)
-   - [Checking Docker Logs](#checking-docker-logs)
+   - [CI/CD Pipeline (GitHub Actions)](#-ci/cd-pipeline-github-actions)
    - [Create a Docker Container](#-create-a-docker-container)
    - [Docker Management Commands](#docker-compose-commands)
 4. [Project Checklist](#project-checklist)
@@ -38,13 +38,24 @@ Navigate to the root project directory you just cloned.
 cd conduit-container
 ```
 
-From here switch to conduit-backend-master directory.
+> [!NOTE]
+> Inside your root directory, you need to create a `.env` file for your environment variables.  
+> You can copy and paste the content from [example.env](./example.env) by running:
+>
+> ```
+> cp example.env .env
+> ```
+>
+> Please keep in mind that the values should only be used for local development for security reasons.
+
+
+Now switch to conduit-backend-master directory.
 ```
 cd conduit-backend-master
 ```
 > [!NOTE]
 > Inside your conduit-backend-master directory, you need to create a `.env` file for your environment variables.  
-> You can copy and paste the content from [example.env](./conduit-backend-master/example.env) by running:
+> You can copy and paste the content from [backend example.env](./conduit-backend-master/example.env) by running:
 >
 > ```
 > cp example.env .env
@@ -99,18 +110,68 @@ Please check the list of typical Docker commands in the section [Docker Manageme
 
 ## 🧑‍💻 Usage
 
-### Checking Docker Logs
+### 🚀 CI/CD Pipeline (GitHub Actions)
 
-Once the App is running you can check the Logs for every container.
-Check the frontend container logs with:
-```
-docker logs conduit-container-frontend-1
-```
+This project includes a fully automated CI/CD pipeline using GitHub Actions, GitHub Container Registry (GHCR), and Docker Compose on your VPS.
 
-Check the backend container logs with:
-```
-docker logs conduit-container-backend-1
-```
+The pipeline:
+
+- Builds the backend & frontend Docker images
+- Pushes them to GHCR
+- SSHs into your server
+- Pulls the latest images
+- Restarts your docker-compose stack
+- Runs on every branch automatically
+
+Can also be triggered manually via “Run workflow”
+
+> [!NOTE]
+> 📦 Required GitHub Secrets
+> To use the CI/CD pipeline in your own repository, you must configure these secrets under:
+> GitHub → Repository → Settings → Secrets and variables → Actions
+> ![Screenshot](screenshot.png)
+
+🔐 Server Access
+
+These are required for GitHub Actions to SSH into your VPS:
+
+- SSH_HOST → Your server IP
+- SSH_USER → The Linux user that owns the VPS deployment directory
+- SSH_KEY → The private SSH key that matches the public key stored in ~/.ssh/authorized_keys on your server
+- GHCR_PAT → Your Personal Access Token (PAT)
+- GHCR_USERNAME → Your GitHub username
+
+You can check the [example.secrets.env](./example.secrets.env) to see how the secrets can look like. But keep in mind you need to set the variables one by one in GitHub → Repository → Settings → Secrets and variables → Actions
+
+> [!NOTE]
+> Generate your Container Registry Access PAT via:
+> GitHub → Settings → Developer Settings → Personal access tokens → Personal access tokens (classic)
+> Minimum required permissions:
+> Packages: Read & Write
+> Metadata: Read
+> Select the repo → Contents: Read
+>
+> You can test GHCR authentication locally:
+>```
+>echo "<YOUR_GHCR_PAT>" | docker login ghcr.io -u <YOUR_USERNAME> --password-stdin
+>```
+
+🛠️ How Deployment Works
+
+When you push to any branch, or run the workflow manually:
+
+1. GitHub Actions checks out your repository
+2. Builds backend & frontend Docker images
+3. Logs in to GHCR
+4. Pushes images to:
+   - ghcr.io/YOUR_USERNAME/YOUR_REPO-backend:latest
+   - ghcr.io/YOUR_USERNAME/YOUR_REPO-frontend:latest
+5. Connects to your VPS via SSH
+6. Pulls the latest image versions
+7. Restarts your Docker Compose stack:
+   - docker compose down
+   - docker compose up -d --pull always
+8. Your application is redeployed instantly 🎉
 
 
 ### 🐳 Create a Docker Container
@@ -139,11 +200,10 @@ In our case all required files already exist. There is nothing to do here.
 | `docker compose down` | Stop and remove containers, networks, and volumes. |
 | `docker compose logs -f` | Follow logs in real time. |
 | `docker compose logs` | Show logs without following. |
-| `docker exec -it minecraft-server /bin/sh` | Open an interactive shell inside the running container. |
 | `docker compose ps` | List running containers. |
 
 ## Project Checklist
 
 You can find a detailed checklist for this project in PDF format:
 
-- [Download the Checklist](../conduit-container/docs/checklist.pdf)
+- [Download the Checklist](../conduit-container-cicd/docs/checklist.pdf)
