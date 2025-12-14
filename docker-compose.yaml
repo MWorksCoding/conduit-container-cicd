@@ -1,22 +1,14 @@
 services:
   frontend:
-    build:
-      context: ./conduit-frontend-master
-      dockerfile: Dockerfile
-    image: conduit-frontend:latest
+    image: ${FRONTEND_IMAGE}
     ports:
       - "8282:80"
     restart: on-failure
     volumes:
       - frontend_data:/usr/share/nginx/html
-    environment:
-      - FRONTEND_API_URL=http://backend:8000/api
 
   backend:
-    build:
-      context: ./conduit-backend-master
-      dockerfile: Dockerfile
-    image: conduit-backend:latest
+    image: ${BACKEND_IMAGE}
     ports:
       - "8000:8000"
     restart: on-failure
