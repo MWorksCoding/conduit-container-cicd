@@ -1,0 +1,32 @@
+services:
+  frontend:
+    build:
+      context: ./conduit-frontend-master
+      dockerfile: Dockerfile
+    image: conduit-frontend:latest
+    ports:
+      - "8282:80"
+    restart: on-failure
+    volumes:
+      - frontend_data:/usr/share/nginx/html
+    environment:
+      - FRONTEND_API_URL=http://backend:8000/api
+
+  backend:
+    build:
+      context: ./conduit-backend-master
+      dockerfile: Dockerfile
+    image: conduit-backend:latest
+    ports:
+      - "8000:8000"
+    restart: on-failure
+    env_file:
+      - ./conduit-backend-master/.env
+    volumes:
+      - backend_data:/app/data
+      - backend_logs:/var/log/conduit
+
+volumes:
+  frontend_data:
+  backend_data:
+  backend_logs:
