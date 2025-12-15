@@ -1,5 +1,8 @@
 services:
   frontend:
+    build:
+      context: ./conduit-frontend-master
+      dockerfile: Dockerfile
     image: ${FRONTEND_IMAGE}
     ports:
       - "8282:80"
@@ -8,6 +11,9 @@ services:
       - frontend_data:/usr/share/nginx/html
 
   backend:
+    build:
+      context: ./conduit-backend-master
+      dockerfile: Dockerfile
     image: ${BACKEND_IMAGE}
     ports:
       - "8000:8000"
